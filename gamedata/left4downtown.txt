@@ -1,0 +1,401 @@
+/* Most symbols & signatures changed to support L4D2 (Not finalised) -XBetaAlpha */
+
+"Games"
+{
+	"#default"
+	{
+
+		"#supported"
+		{
+			"game"		"left4dead2"
+		}
+
+		"Offsets"
+		{
+			/* Offset into SetNextMission or SelectModelByPopulation */
+
+			"TheDirector"
+			{
+				"windows"	"2"
+			}
+			
+			/* Offset into MPGameModeChanged::ConVar */
+
+			"IVEngineServer"
+			{
+				"windows"	"39"
+			}
+			
+			/* Virtual offset for IVEngineServer::IsReserved() */
+
+			"IsReserved"
+			{
+				"windows"	"131"
+
+				"linux"		"131"
+			}
+			
+			/* Offset from ConnectClientLobbyCheck to cmp with max players check	   
+			   string #Valve_Reject_Server_Full
+			*/
+
+			"ValveRejectServerFullFirst"
+			{
+				"windows"	"31"  /* cmp eax, [esi+180h] -> cmp eax, imm32 */ 
+
+				"linux"		"35"  /* cmp edx, [ebp+180h] -> cmp edx, imm32 */
+			}
+			
+			"ClearTeamScore_A"
+			{
+			    /* Into Director::OnServerShutdown()
+				    mov [esi+70Ch], eax
+			      */
+				//"windows"	"60"
+				
+				/* Into Director::ClearTeamScores(bool)
+				   mov dword ptr [esi+708h], 0
+				 */
+				//"linux"	"58"
+			}
+
+			"ClearTeamScore_B"
+			{
+			    /* Into Director::OnServerShutdown()
+				    mov [esi+710h], eax
+			      */
+				//"windows"	"69"
+				/* Into Director::ClearTeamScores(bool)
+				   mov dword ptr [esi+70Ch], 0
+				 */
+				//"linux"	"68"
+			}
+		}
+	}
+	
+	"left4dead2"
+	{
+		"Signatures"
+		{
+			/* 
+			 * CTerrorGameRules::GetTeamScore(int,bool)
+			 */
+			"GetTeamScore"
+			{
+				"library"	"server"
+
+				"linux"	"@_ZN16CTerrorGameRules12GetTeamScoreEib"
+
+				"windows" "\x80\x7C\x24\x08\x00**\x8B\x44\x24\x04\x8B\x84\x81\x50\x03\x00\x00\xC2\x08\x00"
+			}
+			
+			/*
+			 * CTerrorGameRules::ClearTeamScores(bool)  // Director::ClearTeamScores(bool) is inlined on Windows :( 
+			 */
+			"ClearTeamScores"
+			{
+				"library"	"server"
+
+				"linux" "@_ZN16CTerrorGameRules15ClearTeamScoresEb"
+
+				"windows" "\x51\x53\x55\x56\x57\x8B\xF9\x33\xF6\x8D\x9F\x2A\x2A\x2A\x2A\x8D\xAF\x2A\x2A\x2A\x2A\x8D\x2A\x2A\x2A\x50\x56"
+			}
+			
+			/*
+			 * Director::ClearTeamScores(bool clearCampaignScores)  // inlined on Windows :( 
+			 */
+			"ClearTeamScores_Director"
+			{
+				"library"	"server"
+
+				"linux" 	"@_ZN9CDirector15ClearTeamScoresEb"
+			}
+			
+			/*
+			 * CTerrorGameRules::SetCampaignScores(int,int)
+			 */
+			"SetCampaignScores" 
+			{
+				"library"	"server"
+
+				"linux"		"@_ZN16CTerrorGameRules17SetCampaignScoresEii"
+
+				"windows" 	"\x56\x8D\x44\x24\x08\x8D\xB1\x54\x03\x00\x00\x50\x6A\x00\x8B\xCE"
+			}
+			
+			/*
+			 * CBaseServer::ClearReservationStatus()
+			 */
+			"ClearReservationStatus" 
+			{
+				"library"	"engine"
+
+				"linux"		"@_ZN11CBaseServer22ClearReservationStatusEv"
+
+				"windows" 	"\x8B\xC1\x8B\x48\x2A\x56\x8D\x71\x2A\x3B\x70\x2A\xBA\x01\x00\x00\x00\x7E\x03\x88\x50"
+			}
+			
+			/*
+			 * CBaseServer::SetReservationCookie(uint64_t, char*, va_list)
+			 */
+			"SetReservationCookie" 
+			{
+				"library"	"engine"
+
+				"linux"		"@_ZN11CBaseServer20SetReservationCookieEyPKcz"
+
+				"windows" 	"\x81\xEC\x2A\x2A\x2A\x2A\x55\x8B\xAC\x24\x2A\x2A\x2A\x2A\x56\x8B\xB4\x24\x2A\x2A\x2A\x2A\x57\x8B\xBC\x24\x2A\x2A\x2A\x2A\x3B\xBE\x2A\x2A\x2A\x2A\x75\x08\x3B\xAE\x2A\x2A\x2A\x2A\x74\x63"
+			}
+			
+			/*
+			 * CTerrorPlayer::TakeOverBot
+			 */
+			"TakeOverBot"
+			{
+				"library"	"server"
+
+				"linux"	"@_ZN13CTerrorPlayer11TakeOverBotEb"
+
+				"windows" "\x81\x2A\x2A\x2A\x2A\x2A\x53\x55\x56\x57\x8D\x2A\x2A\x2A\x8B\xF9\x33\xDB\x50"
+			}
+			
+			/* 
+			 * SurvivorBot::SetHumanSpectator(CTerrorPlayer*) 
+			 */
+			"SetHumanSpec"
+			{
+				"library"	"server"
+
+				"linux" 	"@_ZN11SurvivorBot17SetHumanSpectatorEP13CTerrorPlayer"
+
+				"windows" 	"\x53\x8B\xD9\x83\x2A\x2A\x2A\x2A\x2A\x2A\x56\x8D\x2A\x2A\x2A\x2A\x2A\x7E\x07\x5E\x32\xC0\x5B\xC2\x04\x00"
+			}
+			
+			/* Used solely to get the offset for TheDirector */
+			"SetNextMission"
+			{
+				"library"	"server"
+
+				"windows"	"\x83\x3D\x2A\x2A\x2A\x2A\x00\x0F\x2A\x2A\x2A\x2A\x2A\x53\x56\x57"
+			}
+			
+			/* Alternative way to get TheDirector offset */
+			"SelectModelByPopulation"
+			{
+				"library"	"server"
+
+				"windows"	"\x8B\x0D\x2A\x2A\x2A\x2A\x81\xEC\x2A\x2A\x00\x00\x56\x57\xE8\x2A\x2A\x2A\x2A\x8B\xF8\x85\xFF"
+			}
+			
+			/* Get the engine offset on Windows 
+				MPGameModeChanged::ConVar(int)
+			 */
+			"MPGameModeChangedConVar"
+			{
+				"library" "server"
+
+				"linux" "@_ZZL18ValidateMpGameModeP7IConVarPKcfE13bSelfChanging"
+
+				"windows" "\x8B\x44\x24\x04\x83\xEC\x08\x56\x57\x50\x8D\x4C\x24\x0C\xE8\x2A\x2A\x2A\x2A\x8B\x2A\x2A\x2A\x8B\x2A\x2A\x56\xB9\x2A\x2A\x2A\x2A\xE8\x2A\x2A\x2A\x2A\x8B\x0D\x2A\x2A\x2A\x2A\x8B\x11\x8B"
+			}
+
+			/* Find the Director/ZombieManager singleton classes */
+			
+			"TheDirector"
+			{
+				"library"	"server"
+
+				"linux"		"@TheDirector"
+			}
+			
+			/* Currently unsupported */
+			"TheZombieManager"
+			{
+				"library"	"server"
+
+				"linux"		"@TheDirector"
+			}
+			
+			"IVEngineServer"
+			{
+				"library"	"server"
+
+				"linux"		"@engine"
+			}
+			
+			/*
+			 * Director::RestartScenario
+			 *    inlined into some other functions on Windows
+			 */
+			"RestartScenario"
+			{
+				"library"	"server"
+
+				"linux"		"@_ZN9CDirector15RestartScenarioEv"
+
+				"windows" 	"\x83\xEC\x28\x53\x56\x8B\xF1\x33\xDB\x38\x9E\x2A\x2A\x00\x00"
+			}
+			
+			/*
+			 * Director::RestartScenarioFromVote(const char*)
+			 */
+			"RestartScenarioFromVote"
+			{
+				"library"	"server"
+
+				"linux"		"@_ZN9CDirector23RestartScenarioFromVoteEPKc"
+
+				"windows"	"\x8B\x44\x24\x04\x85\xC0\x56\x8B\xF1\x74\x12\x6A\x20\x50\x8D\x86\x2A\x2A\x00\x00\x50"
+			}
+			
+			/*
+			* ZombieManager::SpawnTank(Vector  const&, QAngle  const&)
+			*/
+			"SpawnTank"
+			{ 
+				"library"	"server"
+
+				"linux"		"@_ZN13ZombieManager9SpawnTankERK6VectorRK6QAngle"
+
+				"windows"	"\x56\x68\x2A\x2A\x2A\x2A\xE8\x2A\x2A\x2A\x2A\x8B\xF0\x83\xC4\x04\x85\xF6\x75\x04\x5E\xC2\x08\x00\x8B\x06\x8B\x90\x2A\x2A\x2A\x2A\x6A\x00\x6A\x00\x6A\x03\x8B\xCE\xFF\xD2\x6A\x00\x8B\xCE\xE8\x2A\x2A\x2A\x2A\x8B\x2A\x2A\x2A\x50\x8B\xCE\xE8\x2A\x2A\x2A\x2A\x8B\x2A\x2A\x2A\x51\x8B\xCE\xE8\x2A\x2A\x2A\x2A\x89\x2A\x2A\x2A\x2A\x2A\x8B\x16\x8B\x42\x2A\x8B\xCE\xFF\xD0\x6A\x01\x6A\x05"
+			}
+			
+			/*
+			* ZombieManager::SpawnWitch(Vector  const&, QAngle  const&)
+			*/
+			"SpawnWitch"
+			{ 
+				"library"	"server"
+
+				"linux"		"@_ZN13ZombieManager10SpawnWitchERK6VectorRK6QAngle"
+
+				"windows"	"\x56\x6A\x01\x6A\xFF\x68\x2A\x2A\x2A\x2A\xE8\x2A\x2A\x2A\x2A\x8B\xF0\x83\xC4\x2A\x85\xF6\x75\x04\x5E\xC2\x08\x00"
+			}
+			
+			/*
+			 * bool IVEngineServer::IsReserved() on Linux (virtual)
+			 * bool CBaseServer::IsReserved() on Windows, appears to be inlined on Linux
+			 * 
+			 */
+
+			"IsReserved"
+			{
+				"library"	"engine"
+
+				"linux"		"@_ZN14IVEngineServer10IsReservedEv"
+
+				"windows"	"\x8B\x81\x2A\x2A\x2A\x2A\x0B\x81\x2A\x2A\x2A\x2A\x74\x06\xB8\x01\x00\x00\x00\xC3\x33\xC0\xC3"
+			}
+			
+			/*
+			* Director::OnMissionStart()
+			*/
+
+			"OnMissionStart"
+			{
+				"library"	"server"
+
+				"linux"		"@_ZN8Director14OnMissionStartEv"
+			}
+			
+			/*
+			 * Director::OnServerShutdown()
+			 *
+			 * used to get the campaign score offsets on Windows
+			 */
+
+			"OnServerShutdown"
+			{
+				"library"	"server"
+
+				"linux"		"@_ZN9CDirector16OnServerShutdownEv"
+
+				"windows"	"\x51\x53\x56\x8B\xF1\xE8\x2A\x2A\x2A\x2A\xE8\x2A\x2A\x2A\x2A\x33\xDB\x89\x9E\x2A\x2A\x2A\x2A\x88\x9E\x2A\x2A\x2A\x2A\x8B\x0D\x2A\x2A\x2A\x2A\x3B\xCB\x88\x1D\x2A\x2A\x2A\x2A\x88\x1D"
+			}
+			
+			/*
+			 * CGameServer::SetMaxClients(int)
+			 *
+			 * will use in future to change max clients
+			 */
+
+			"SetMaxClients"
+			{
+				"library"	"engine"
+
+				"linux"		"@_ZN11CGameServer13SetMaxClientsEi"
+			}
+
+			"GetMaxClients"
+			{
+				"library"	"engine"
+
+				"linux"		"@_ZNK11CBaseServer13GetMaxClientsEv"
+			}
+			
+			/*
+			* CTerrorGameRules::GetMaxHumanPlayers(void)
+			* We just override the return value to our own
+			* 
+			* This method is called for max players when viewing server info
+			*/
+
+			"GetMaxHumanPlayers"
+			{
+				"library"	"server"
+
+				"linux"		"@_ZNK16CTerrorGameRules18GetMaxHumanPlayersEv"
+
+				"windows"	"\xF7\x05\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x74\x07\xB8\x2A\x2A\x2A\x2A\xEB\x11\xA1\x2A\x2A\x2A\x2A\x8B\x40\x2A\x85\xC0\x75\x05\xB8\x2A\x2A\x2A\x2A\x68\x2A\x2A\x2A\x2A\x50\xE8\x2A\x2A\x2A\x2A\x83\x2A\x2A\xF7\xD8\x1B\xC0\x83\xE0\xFC\x83\xC0\x08\xC3"
+			}
+
+			/*
+			* Total Number of Players Supported (Steam Group/Lobby)
+			* Currently disabled - SourceMod unable to look up other libraries.
+			*
+                        "GetTotalNumPlayersSupported"
+                        {
+                                "library"       "matchmaking_ds"
+                                "linux"         "@_ZN11CMatchTitle27GetTotalNumPlayersSupportedEv"
+                        }
+			*/
+
+			/* CServerGameClients::GetPlayerLimits(int& , int&, int&) */
+
+			"GetPlayerLimits"
+			{
+				"library"	"server"
+				"linux"		"@_ZNK18CServerGameClients15GetPlayerLimitsERiS0_S0_"
+			}
+
+			/* Not an actual function,
+			   this is inside CBaseServer::ConnectClient (a jz instruction)
+			   
+			   use it to remove skippable code when sv_allow_lobby_connect 0
+			   */
+
+			"ConnectClientLobbyCheck"
+			{
+				"library"	"engine"
+
+				"linux"		"\x8B\x2A\x2A\x2A\x2A\x2A\x2A\x8B\x45\x2A\x8B\x79\x2A\x89\x2A\x2A\xFF\x2A\x2A\x8B\x5D\x00\x89\x2A\x2A\x89\xC6\xFF\x53\x2A\x8D\x14\x3E\x29\xC2\x3B\x95"
+
+				"windows"	"\x74\x2A\x8B\x54\x2A\x2A\x8B\x06\x8B\x7A\x2A\x8B\x50\x2A\x8B\xCE\xFF\xD2\x2B\xF8\x8B\x06\x8B\x50\x2A\x8B\xCE\xFF\xD2\x03\xC7"
+			}
+			
+			/* Not an actual function,
+			   This rejects players when there are all full human players
+			   
+			   string "Human player limit reached (%d/%d)"
+			   */
+			"HumanPlayerLimitReached"
+			{
+				"library"	"server"
+
+				"linux"		"\x7E\x35\x8B\x74\x24\x2A\x89\x6C\x24\x2A\x8B\x44\x24\x2A\x8B\x6C\x24\x2A\x8B\x4C\x24\x2A\x89\x74\x24\x2A\x89\x7C\x24\x2A\x89\x6C\x24\x2A\x89\x44\x24\x2A\x89\x4C\x24\x2A"
+
+				"windows" 	"\x7C\x2A\x8B\x2A\x2A\x2A\x8B\x2A\x2A\x2A\x50\x57\x68\x2A\x2A\x2A\x2A\x51\x52\xE8\x2A\x2A\x2A\x2A\x83\xC4\x2A\x5F\x5E\x32\xC0\x5B"
+			}
+		}	
+	}
+}
